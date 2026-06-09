@@ -320,13 +320,14 @@ async function cadastrar() {
     if(error) return alert("Erro ao criar conta: " + error.message);
 
     if(data.user) {
+        // Correção aplicada na estrutura dos campos de Perfil
         await sb.from('usuarios').insert([{
             id: data.user.id,
             email: e,
             role: 'operador',
             status: 'ativo',
             empresa: document.getElementById('p-empresa').value,
-            : document.getElementById('p-').value
+            cnpj: document.getElementById('p-cnpj').value
         }]);
         alert("✅ Conta criada com sucesso! Você já pode acessar o sistema.");
     }

@@ -6,9 +6,7 @@
     <title>SENTINELA OPS - CLOUD V2</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         :root {
@@ -26,26 +24,14 @@
         .card h3 { margin: 0 0 16px 0; padding-bottom: 10px; border-bottom: 3px solid var(--accent); color: var(--accent); font-size: 0.98rem; text-transform: uppercase; font-weight: 700; }
         label { display: block; font-size: 0.76rem; font-weight: 600; color: #94a3b8; margin: 14px 0 5px 0; text-transform: uppercase; }
         input, select, textarea { width: 100%; padding: 13px 14px; background: #1e2a44; border: 1px solid #475569; border-radius: 6px; color: white; font-size: 1rem; }
+        input[readonly] { background: #141e30; color: #94a3b8; cursor: not-allowed; border-color: #334155; }
         .btn { width: 100%; padding: 16px; margin-top: 12px; border: none; border-radius: 6px; font-weight: 700; font-size: 0.96rem; text-transform: uppercase; cursor: pointer; }
         .btn-primary { background: var(--accent); color: #0a192f; }
         .btn-danger { background: var(--danger); color: white; }
         .btn-info { background: #2563eb; color: white; }
         .posto-item { background: #1e2a44; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #334155; }
         .btn-small { padding: 6px 10px; border-radius: 4px; border: none; font-size: 0.7rem; font-weight: bold; cursor: pointer; margin-left: 5px; color: white; text-transform: uppercase; }
-        
-         .ronda-entry { 
-    background: #1e2a44; 
-    padding: 13px; 
-    border-radius: 6px; 
-    margin-bottom: 9px;
-    border-left: 5px solid var(--accent); 
-    font-size: 0.87rem; 
-    width: 100%; 
-    box-sizing: border-box; 
-    display: block;
-    float: none;
-    clear: both;
-}
+        .ronda-entry { background: #1e2a44; padding: 13px; border-radius: 6px; margin-bottom: 9px; border-left: 5px solid var(--accent); font-size: 0.87rem; width: 100%; box-sizing: border-box; display: block; float: none; clear: both; }
         .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--primary); display: flex; border-top: 4px solid var(--accent); z-index: 1000; }
         .nav-item { flex: 1; text-align: center; padding: 10px 6px; color: #94a3b8; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; cursor: pointer; }
         .nav-item.active { color: var(--accent); }
@@ -53,28 +39,9 @@
         .checklist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 10px; }
         .check-item { background: #1e2a44; border: 2px solid #475569; padding: 13px 10px; border-radius: 6px; text-align: center; font-size: 0.79rem; cursor: pointer; }
         .check-item.ok { border-color: var(--success); color: var(--success); background: rgba(35, 134, 54, 0.2); }
-        /* Une o campo de busca ao select abaixo dele */
-#filtro-posto-ronda {
-    border-bottom: none;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    background: #1e2a44;
-    border-color: var(--accent);
-}
-
-/* Ajusta o select para encaixar perfeitamente no filtro */
-#r-posto {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    margin-top: -1px;
-}
-
-/* Destaque visual quando você clica para digitar */
-#filtro-posto-ronda:focus {
-    outline: none;
-    background: #253454;
-    box-shadow: 0 0 5px var(--accent);
-}
+        #filtro-posto-ronda { border-bottom: none; border-bottom-left-radius: 0; border-bottom-right-radius: 0; background: #1e2a44; border-color: var(--accent); }
+        #r-posto { border-top-left-radius: 0; border-top-right-radius: 0; margin-top: -1px; }
+        #filtro-posto-ronda:focus { outline: none; background: #253454; box-shadow: 0 0 5px var(--accent); }
     </style>
 </head>
 <body>
@@ -96,7 +63,8 @@
         <div style="text-align: center; margin-top: 18px;">
             <a href="#" onclick="recuperarSenha(); return false;" style="color: #94a3b8; font-size: 0.85rem; text-decoration: none; border-bottom: 1px solid #475569; padding-bottom: 2px;">Esqueci minha senha</a>
         </div>
-    </div> </div>
+    </div> 
+</div>
 
 <div id="app-content" class="hidden">
     <div class="header">
@@ -115,24 +83,20 @@
         <div class="card">
             <h3>NOVA ATIVIDADE</h3>
             <button id="btn-intervalo" class="btn btn-info" onclick="gerenciarIntervalo()">☕ INICIAR INTERVALO</button>
+           
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:10px;">
                 <div><label>VTR (Editar Placa)</label><input type="text" id="r-placa" placeholder="ABC-1234"></div>
                 <div><label>KM</label><input type="number" id="r-km"></div>
             </div>
             <label>Filtrar Posto</label>
             <input type="text" id="filtro-posto-ronda" placeholder="Digite para buscar..." onkeyup="atualizarSelectPostos()">
+           
             <label>Posto / Local Selecionado</label>
             <select id="r-posto"></select>
             <div style="display:grid; grid-template-columns: 2fr 1fr; gap:12px;">
-    <div>
-        <label>Colaborador no Local</label>
-        <input type="text" id="r-func" placeholder="Nome do colaborador">
-    </div>
-    <div>
-        <label>Matrícula</label>
-        <input type="text" id="r-func-mat" placeholder="0000">
-    </div>
-</div>
+                <div><label>Colaborador no Local</label><input type="text" id="r-func" placeholder="Nome do colaborador"></div>
+                <div><label>Matrícula</label><input type="text" id="r-func-mat" placeholder="0000"></div>
+            </div>
             <label>Missão</label>
             <select id="r-motivo" onchange="toggleFiscalizacao()">
                 <option value="Fiscalização">Fiscalização</option>
@@ -182,14 +146,20 @@
         <div class="card">
             <h3>DADOS DO OPERADOR</h3>
             <label>Nome Completo</label><input type="text" id="p-nome">
-            <label>Matrícula</label><input type="text" id="p-matrícula">
+            <label>Matrícula</label><input type="text" id="p-matricula">
             <label>Cargo</label><input type="text" id="p-cargo">
             <label>Viatura (Placa)</label><input type="text" id="p-placa">
-            <label>Empresa</label><input type="text" id="p-empresa">
-            <label>CNPJ</label><input type="text" id="p-cnpj">
+            
+            <label>Empresa</label>
+            <input type="text" id="p-empresa" value="QUÂNTICA SISTEMAS DE SEGURANÇA INTELIGENTE LTDA" readonly>
+            
+            <label>CNPJ</label>
+            <input type="text" id="p-cnpj" value="30.621.295/0001-84" readonly>
+            
             <button class="btn btn-primary" onclick="salvarPerfil()">SALVAR NO CLOUD</button>
         </div>
     </div>
+
     <div id="view-admin" class="container hidden">
         <div class="card">
             <h3>LANÇAMENTO RETROATIVO / GESTÃO</h3>
@@ -199,14 +169,8 @@
             <select id="adm-usuario" onchange="atualizarVtrAdmin()"></select>
 
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
-                <div>
-                    <label>VTR (Placa)</label>
-                    <input type="text" id="adm-placa" readonly style="opacity: 0.7;">
-                </div>
-                <div>
-                    <label>KM Atual</label>
-                    <input type="number" id="adm-km">
-                </div>
+                <div><label>VTR (Placa)</label><input type="text" id="adm-placa" readonly style="opacity: 0.7;"></div>
+                <div><label>KM Atual</label><input type="number" id="adm-km"></div>
             </div>
 
             <label>2. POSTO / LOCAL *</label>
@@ -216,14 +180,8 @@
             <input type="text" id="adm-func" placeholder="Nome do colaborador">
 
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
-                <div>
-                    <label>Data da Ronda</label>
-                    <input type="date" id="adm-data">
-                </div>
-                <div>
-                    <label>Hora da Ronda</label>
-                    <input type="time" id="adm-hora">
-                </div>
+                <div><label>Data da Ronda</label><input type="date" id="adm-data"></div>
+                <div><label>Hora da Ronda</label><input type="time" id="adm-hora"></div>
             </div>
 
             <label>Missão</label>
@@ -256,31 +214,13 @@
 </div>
 
 <script>
-// --- CONFIG FIREBASE ---
-const firebaseConfig = {
-    apiKey: "AIzaSyBL4Nka91iGIAWSTfvAmsqDHCj2KMhWZ70",
-    authDomain: "sentinela-ops-profissional.firebaseapp.com",
-    projectId: "sentinela-ops-profissional",
-    storageBucket: "sentinela-ops-profissional.firebasestorage.app",
-    messagingSenderId: "458111218365",
-    appId: "1:458111218365:web:0f3b41ab7c2ceb7feebdd4"
-};
+// --- CONFIG SUPABASE ---
+const supabaseUrl = 'https://SEU-PROJETO.supabase.co';
+const supabaseKey = 'SUA-CHAVE-ANON-AQUI';
+const sb = supabase.createClient(supabaseUrl, supabaseKey);
 
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const fs = firebase.firestore();
-
-// ATIVAÇÃO DA PERSISTÊNCIA OFFLINE (Adicione este bloco aqui)
-fs.enablePersistence().catch((err) => {
-    if (err.code == 'failed-precondition') {
-        console.warn("Persistência offline falhou: múltiplas abas do sistema abertas.");
-    } else if (err.code == 'unimplemented') {
-        console.warn("O navegador atual não suporta persistência offline.");
-    }
-});
-
-let db = JSON.parse(localStorage.getItem('sentinela_ops_db')) ||
-{ perfil: {}, postos: [], rondas: [], intervaloAtivo: null };
+let currentUserUid = null;
+let db = JSON.parse(localStorage.getItem('sentinela_ops_db')) || { perfil: {}, postos: [], rondas: [], intervaloAtivo: null };
 let fotoBase64 = "";
 let listaUsuariosAdmin = [];
 
@@ -295,123 +235,121 @@ function gerenciarMenuAdmin() {
     }
 }
 
-// CORREÇÃO: Função de escuta e sincronização temporal revisada
-// CORREÇÃO DEFINITIVA: Sincronização resiliente a falhas de rede e offline
-async function carregarDadosSincronizados(uid) {
-    try {
-        // 1. Carrega o Perfil
-        const userDoc = await fs.collection("usuarios").doc(uid).get();
-        if (userDoc.exists) {
-            db.perfil = userDoc.data();
-        } else {
-            db.perfil = { nome: auth.currentUser.email, role: "operador" };
-        }
-        
-        // 2. Carrega os Postos
-        const postosSnap = await fs.collection("postos").get();
-        db.postos = postosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-        // 3. Carrega as Rondas (Traz as últimas 50 do utilizador logado, evitando dependência de fuso horário local)
-        const rondasSnap = await fs.collection("rondas")
-            .where("uid", "==", uid)
-            .limit(50)
-            .get();
-
-        // Mapeia os dados da nuvem
-        const rondasRemotasCompletas = rondasSnap.docs.map(doc => doc.data());
-
-        // FILTRO INTELIGENTE: Ignora as rondas descarregadas que pertencem a plantões anteriores ao último zeramento
-        const dataZeramento = db.perfil.ultimoZeramento || 0;
-        const rondasRemotas = rondasRemotasCompletas.filter(r => r.id > dataZeramento);
-
-        // Mescla com o localStorage para garantir que rondas recém-feitas offline não sumam
-        const mapaRondas = new Map();
-        db.rondas.forEach(r => mapaRondas.set(r.id, r));
-        rondasRemotas.forEach(r => mapaRondas.set(r.id, r));
-
-        // Ordena para exibir sempre a mais recente primeiro
-        db.rondas = Array.from(mapaRondas.values()).sort((a, b) => b.id - a.id);        
-        saveLocal();
-        gerenciarMenuAdmin();
-        
-        // Atualiza a tela de rondas caso o usuário já esteja nela
-        if (document.getElementById('view-rondas').classList.contains('hidden') === false) {
-            renderRondas();
-        }
-        
-        showView('home');
-    } catch (e) {
-        console.error("Erro na sincronização (operando em modo offline):", e);
-        // Se falhar por falta de rede, mantém o que está no localStorage e avança para o app
-        gerenciarMenuAdmin();
-        showView('home');
-    }
-}
-
 function isAdmin() {
     return db.perfil && db.perfil.role === "admin";
 }
 
-auth.onAuthStateChanged(user => {
-    if (user) {
+sb.auth.onAuthStateChange((event, session) => {
+    if (session) {
+        currentUserUid = session.user.id;
         document.getElementById('view-login').classList.add('hidden');
         document.getElementById('app-content').classList.remove('hidden');
-        carregarDadosSincronizados(user.uid);
+        carregarDadosSincronizados(currentUserUid, session.user.email);
     } else {
+        currentUserUid = null;
         document.getElementById('view-login').classList.remove('hidden');
         document.getElementById('app-content').classList.add('hidden');
     }
 });
 
-function login() {
-    const e = document.getElementById('login-email').value;
-    const s = document.getElementById('login-senha').value;
-    if(!e || !s) return alert("Preencha os campos!");
-    auth.signInWithEmailAndPassword(e, s).catch(err => alert("Erro: " + err.message));
-}
-
-function cadastrar() {
-    const e = document.getElementById('login-email').value;
-    const s = document.getElementById('login-senha').value;
-    
-    if(!e || !s) return alert("Preencha os campos!");
-
-    auth.createUserWithEmailAndPassword(e, s)
-        .then(async (cred) => {
-            // Cria o documento base no Firestore imediatamente após o cadastro
-            await fs.collection("usuarios").doc(cred.user.uid).set({
-                email: e,
-                role: 'operador', // Exigido pela regra de segurança
-                status: 'ativo'   // Exigido pela regra de segurança
-            });
-            alert("✅ Conta criada com sucesso! Você já pode acessar o sistema.");
-        })
-        .catch(err => alert("Erro ao criar conta: " + err.message));
-}
-
-// ADICIONADO: Função para recuperar a senha
-function recuperarSenha() {
-    const email = document.getElementById('login-email').value;
-    
-    if (!email) {
-        return alert("Por favor, digite seu e-mail no campo acima antes de clicar em 'Esqueci minha senha'.");
+sb.auth.getSession().then(({ data: { session } }) => {
+    if (session) {
+        currentUserUid = session.user.id;
+        document.getElementById('view-login').classList.add('hidden');
+        document.getElementById('app-content').classList.remove('hidden');
+        carregarDadosSincronizados(currentUserUid, session.user.email);
     }
+});
 
-    auth.sendPasswordResetEmail(email)
-        .then(() => {
-            alert("✅ Link de recuperação enviado! Verifique sua caixa de entrada (e também o Lixo Eletrônico/Spam).");
-        })
-        .catch(err => {
-            // Tratamento amigável para o erro mais comum
-            if (err.code === 'auth/user-not-found') {
-                alert("Erro: Este e-mail não está cadastrado no sistema.");
-            } else {
-                alert("Erro ao tentar recuperar a senha: " + err.message);
-            }
-        });
+async function carregarDadosSincronizados(uid, email) {
+    try {
+        const { data: userDoc } = await sb.from('usuarios').select('*').eq('id', uid).single();
+        if (userDoc) {
+            db.perfil = userDoc;
+        } else {
+            db.perfil = { nome: email, role: "operador" };
+        }
+        
+        const { data: postosSnap } = await sb.from('postos').select('*');
+        if (postosSnap) db.postos = postosSnap;
+
+        const { data: rondasSnap } = await sb.from('rondas')
+            .select('*')
+            .eq('uid', uid)
+            .order('id', { ascending: false })
+            .limit(50);
+            
+        const rondasRemotasCompletas = rondasSnap || [];
+        const dataZeramento = db.perfil.ultimoZeramento || 0;
+        const rondasRemotas = rondasRemotasCompletas.filter(r => r.id > dataZeramento);
+
+        const mapaRondas = new Map();
+        db.rondas.forEach(r => mapaRondas.set(r.id, r));
+        rondasRemotas.forEach(r => mapaRondas.set(r.id, r));
+
+        db.rondas = Array.from(mapaRondas.values()).sort((a, b) => b.id - a.id);
+        saveLocal();
+        gerenciarMenuAdmin();
+        
+        if (document.getElementById('view-rondas').classList.contains('hidden') === false) {
+            renderRondas();
+        }
+        showView('home');
+    } catch (e) {
+        console.error("Erro na sincronização (operando em modo offline):", e);
+        gerenciarMenuAdmin();
+        showView('home');
+    }
 }
 
-function logout() { auth.signOut(); }
+async function login() {
+    const e = document.getElementById('login-email').value;
+    const s = document.getElementById('login-senha').value;
+    if(!e || !s) return alert("Preencha os campos!");
+    
+    const { error } = await sb.auth.signInWithPassword({ email: e, password: s });
+    if(error) alert("Erro: " + error.message);
+}
+
+async function cadastrar() {
+    const e = document.getElementById('login-email').value;
+    const s = document.getElementById('login-senha').value;
+    if(!e || !s) return alert("Preencha os campos!");
+
+    const { data, error } = await sb.auth.signUp({ email: e, password: s });
+    if(error) return alert("Erro ao criar conta: " + error.message);
+
+    if(data.user) {
+        await sb.from('usuarios').insert([{
+            id: data.user.id,
+            email: e,
+            role: 'operador',
+            status: 'ativo',
+            empresa: document.getElementById('p-empresa').value,
+            : document.getElementById('p-').value
+        }]);
+        alert("✅ Conta criada com sucesso! Você já pode acessar o sistema.");
+    }
+}
+
+async function recuperarSenha() {
+    const email = document.getElementById('login-email').value;
+    if (!email) return alert("Por favor, digite seu e-mail no campo acima antes de clicar em 'Esqueci minha senha'.");
+
+    const { error } = await sb.auth.resetPasswordForEmail(email);
+    if(error) {
+        alert("Erro ao tentar recuperar a senha: " + error.message);
+    } else {
+        alert("✅ Link de recuperação enviado! Verifique sua caixa de entrada.");
+    }
+}
+
+async function logout() { 
+    await sb.auth.signOut(); 
+    localStorage.removeItem('sentinela_ops_db');
+    db = { perfil: {}, postos: [], rondas: [], intervaloAtivo: null };
+}
+
 function saveLocal() { localStorage.setItem('sentinela_ops_db', JSON.stringify(db)); }
 
 function showView(v) {
@@ -420,6 +358,7 @@ function showView(v) {
     document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
     document.getElementById('nav-' + v).classList.add('active');
     gerenciarMenuAdmin();
+    
     if (v === 'rondas') {
         document.getElementById('r-placa').value = db.perfil.placa || "N/A";
         atualizarSelectPostos();
@@ -427,6 +366,7 @@ function showView(v) {
     }
     if (v === 'perfil') preencherCamposPerfil();
     if (v === 'postos') renderPostos();
+    
     if (v === 'admin') {
         if (!isAdmin()) {
             alert("Acesso restrito a Administradores.");
@@ -440,14 +380,13 @@ function showView(v) {
     }
 }
 
-// CORREÇÃO: Injeção do serverTimestamp remoto protegendo a persistência local
 async function salvarRonda() {
     const posto = document.getElementById('r-posto').value;
     if(!posto) return alert("Selecione um posto!");
 
     const novaRonda = {
         id: Date.now(),
-        uid: auth.currentUser.uid,
+        uid: currentUserUid,
         posto: posto,
         km: document.getElementById('r-km').value || "0",
         colaborador: document.getElementById('r-func').value || "N/A",
@@ -468,10 +407,9 @@ async function salvarRonda() {
     };
 
     try {
-        await fs.collection("rondas").add({
-            ...novaRonda,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
+        const { error } = await sb.from('rondas').insert([novaRonda]);
+        if (error) throw error;
+        
         db.rondas.unshift(novaRonda);
         saveLocal();
         renderRondas();
@@ -479,6 +417,9 @@ async function salvarRonda() {
         alert("✅ Ronda salva com sucesso!");
     } catch(e) {
         alert("Erro ao salvar ronda: " + e.message);
+        db.rondas.unshift(novaRonda);
+        saveLocal();
+        renderRondas();
     }
 }
 
@@ -491,7 +432,9 @@ function renderRondas() {
                     <strong>${r.hora}</strong> - ${r.posto}<br>
                     <small>${r.motivo} | KM: ${r.km}</small>
                 </div>
-                <button onclick='reimprimirCard(${JSON.stringify(r).replace(/'/g, "'")})' class="btn-small" style="background:var(--accent); color:#000;">🖨️ CARD</button>        </div>
+                <button onclick='reimprimirCard(${JSON.stringify(r).replace(/'/g, "'")})' class="btn-small" style="background:var(--accent); color:#000;">🖨️ CARD</button>        
+            </div>
+        </div>
     `).join('');
 }
 
@@ -513,9 +456,8 @@ function gerarCardIndividual(r) {
     doc.setFont("helvetica", "normal");
     doc.text(`Data: ${r.data} | Hora: ${r.hora}`, 5, y);
     y += 5;
-    // Captura a placa que estava no campo da ronda no momento
-const placaUsada = document.getElementById('r-placa').value || "---";
-doc.text(`VTR: ${placaUsada} | KM: ${r.km}`, 5, y);
+    const placaUsada = document.getElementById('r-placa').value || "---";
+    doc.text(`VTR: ${placaUsada} | KM: ${r.km}`, 5, y);
     y += 5;
     doc.text(`COLABORADOR: ${r.colaborador.toUpperCase()} | MAT: ${r.colaboradorMat || "---"}`, 5, y);
     y += 8;
@@ -548,11 +490,15 @@ async function adicionarPosto() {
     const nome = prompt("Nome do Posto:");
     if(!nome) return;
     const endereco = prompt("Endereço:");
-    const novoPosto = { nome: nome.toUpperCase(), endereco: endereco || "Sem endereço", uid: auth.currentUser.uid };
-    const docRef = await fs.collection("postos").add(novoPosto);
-    db.postos.push({ id: docRef.id, ...novoPosto });
-    saveLocal();
-    renderPostos();
+    
+    const novoPosto = { nome: nome.toUpperCase(), endereco: endereco || "Sem endereço", uid: currentUserUid };
+    const { data, error } = await sb.from('postos').insert([novoPosto]).select();
+    
+    if(!error && data) {
+        db.postos.push(data[0]);
+        saveLocal();
+        renderPostos();
+    }
 }
 
 function renderPostos() {
@@ -560,6 +506,7 @@ function renderPostos() {
     const container = document.getElementById('lista-postos');
     const btnNovoPosto = document.querySelector('button[onclick="adicionarPosto()"]');
     if (btnNovoPosto) btnNovoPosto.style.display = isAdmin() ? "block" : "none";
+    
     const filtrados = db.postos.filter(p => p.nome.includes(busca));
     container.innerHTML = filtrados.map((p, i) => `
     <div class="posto-item">
@@ -568,14 +515,13 @@ function renderPostos() {
         </div>
         <div style="display:flex;">
             <button onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.endereco)}', '_blank')" class="btn-small" style="background:#238636;">ROTA</button>
-            
             ${isAdmin() ? `
                 <button onclick="editarPosto('${p.id}', ${db.postos.indexOf(p)})" class="btn-small" style="background:#2563eb;">✏️</button>
                 <button onclick="excluirPosto('${p.id}', ${db.postos.indexOf(p)})" class="btn-small" style="background:#f85149;">🗑️</button>
             ` : ""}      
         </div>
     </div>
-`).join('');
+    `).join('');
 }
 
 async function editarPosto(id, index) {
@@ -583,9 +529,11 @@ async function editarPosto(id, index) {
     const posto = db.postos[index];
     const novoNome = prompt("Editar nome do Posto:", posto.nome);
     const novoEndereco = prompt("Editar endereço:", posto.endereco);
+    
     if (novoNome) {
         const dadosAtualizados = { nome: novoNome.toUpperCase(), endereco: novoEndereco || "Sem endereço" };
-        if(id) await fs.collection("postos").doc(id).update(dadosAtualizados);
+        if(id) await sb.from('postos').update(dadosAtualizados).eq('id', id);
+        
         db.postos[index] = { ...posto, ...dadosAtualizados };
         saveLocal();
         renderPostos();
@@ -595,21 +543,25 @@ async function editarPosto(id, index) {
 async function excluirPosto(id, index) {
     if (!isAdmin()) return alert("Acesso negado.");
     if(!confirm("Excluir posto?")) return;
-    if(id) await fs.collection("postos").doc(id).delete();
+    
+    if(id) await sb.from('postos').delete().eq('id', id);
     db.postos.splice(index, 1);
     saveLocal();
     renderPostos();
 }
 
 async function zerarRondasPlantao() {
-    if (!auth.currentUser) return alert("Usuário não autenticado.");
+    if (!currentUserUid) return alert("Usuário não autenticado.");
     const confirmar = confirm("ATENÇÃO!\n\nEsta ação irá ocultar as rondas locais do seu dispositivo para iniciar uma nova jornada de trabalho.\n\nOs registros remotos salvos na nuvem continuarão intactos para auditoria da gerência.\n\nDeseja continuar?");
+    
     if (!confirmar) return;
     try {
         const agora = Date.now();
         db.perfil.ultimoZeramento = agora;
-        await fs.collection("usuarios").doc(auth.currentUser.uid).set({ ultimoZeramento: agora }, { merge: true });
-        limparDadosLocaisRondas();
+        await sb.from('usuarios').update({ ultimoZeramento: agora }).eq('id', currentUserUid);
+        
+        db.rondas = [];
+        saveLocal();
         renderRondas();
         alert("✅ Rondas zeradas com sucesso! Novo plantão iniciado.");
     } catch (e) { 
@@ -617,38 +569,20 @@ async function zerarRondasPlantao() {
     }
 }
 
-async function excluirRondasFirebaseUsuario(uid) {
-    while (true) {
-        const snap = await fs.collection("rondas").where("uid", "==", uid).limit(450).get();
-        if (snap.empty) break;
-        const batch = fs.batch();
-        snap.forEach(doc => batch.delete(doc.ref));
-        await batch.commit();
-        if (snap.size < 450) break;
-    }
-}
-
-function limparDadosLocaisRondas() {
-    db.rondas = [];
-    saveLocal();
-}
-
 async function salvarPerfil() {
     const p = {
         nome: document.getElementById('p-nome').value,
-        matricula: document.getElementById('p-matrícula').value,
+        matricula: document.getElementById('p-matricula').value,
         cargo: document.getElementById('p-cargo').value,
         placa: document.getElementById('p-placa').value.toUpperCase(),
-        empresa: document.getElementById('p-empresa').value,
-        cnpj: document.getElementById('p-cnpj').value
+        empresa: document.getElementById('p-empresa').value, // Envia o valor fixo do input
+        cnpj: document.getElementById('p-cnpj').value        // Envia o valor fixo do input
     };
-    
     db.perfil = { ...db.perfil, ...p };
     saveLocal();
     
     try {
-        // O merge: true fará apenas a atualização dos dados, preservando o role e status criados no cadastro
-        await fs.collection("usuarios").doc(auth.currentUser.uid).set(p, { merge: true });
+        await sb.from('usuarios').update(p).eq('id', currentUserUid);
         alert("✅ Perfil salvo no Cloud!");
     } catch (e) {
         alert("Erro técnico ao salvar perfil: " + e.message);
@@ -658,11 +592,10 @@ async function salvarPerfil() {
 function preencherCamposPerfil() {
     const p = db.perfil;
     document.getElementById('p-nome').value = p.nome || "";
-    document.getElementById('p-matrícula').value = p.matricula || "";
+    document.getElementById('p-matricula').value = p.matricula || "";
     document.getElementById('p-cargo').value = p.cargo || "";
     document.getElementById('p-placa').value = p.placa || "";
-    document.getElementById('p-empresa').value = p.empresa || "";
-    document.getElementById('p-cnpj').value = p.cnpj || "";
+    // Nota: Os campos Empresa e CNPJ não são sobrescritos aqui porque são controlados estaticamente no HTML.
 }
 
 function atualizarSelectPostos() {
@@ -670,29 +603,14 @@ function atualizarSelectPostos() {
     const filtroInput = document.getElementById('filtro-posto-ronda');
     const termo = filtroInput ? filtroInput.value.toUpperCase() : "";
 
-    // Limpa o select mas mantém a estrutura
     sel.innerHTML = '';
+    const postosFiltrados = db.postos.filter(p => p.nome.toUpperCase().includes(termo));
     
-    // Filtra os postos localmente
-    const postosFiltrados = db.postos.filter(p => 
-        p.nome.toUpperCase().includes(termo)
-    );
-
-    // Se não houver termo de busca, adiciona o "Selecione..."
     if (termo === "") {
         sel.innerHTML = '<option value="">Selecione o posto...</option>';
     }
-
-    // Renderiza os que coincidem
-    postosFiltrados.forEach(p => {
-        sel.innerHTML += `<option value="${p.nome}">${p.nome}</option>`;
-    });
-
-    // Toque de "Instantâneo": Se houver resultados, expande visualmente (opcional)
-    // ou apenas garante que o primeiro da busca já seja o valor atual do select
-    if (postosFiltrados.length > 0 && termo !== "") {
-        sel.value = postosFiltrados[0].nome;
-    }
+    postosFiltrados.forEach(p => { sel.innerHTML += `<option value="${p.nome}">${p.nome}</option>`; });
+    if (postosFiltrados.length > 0 && termo !== "") { sel.value = postosFiltrados[0].nome; }
 }
 
 function gerenciarIntervalo() {
@@ -703,9 +621,9 @@ function gerenciarIntervalo() {
         btn.style.background = "var(--danger)";
         alert("Intervalo iniciado às " + db.intervaloAtivo);
     } else {
-    const fim = new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
-    alert(`Intervalo finalizado!\nInício: ${db.intervaloAtivo}\nFim: ${fim}`);
-    db.intervaloAtivo = null;
+        const fim = new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+        alert(`Intervalo finalizado!\nInício: ${db.intervaloAtivo}\nFim: ${fim}`);
+        db.intervaloAtivo = null;
         btn.innerText = "☕ INICIAR INTERVALO";
         btn.style.background = "#2563eb";
     }
@@ -777,16 +695,13 @@ function gerarRelatorioPlantao() {
     doc.setFont("helvetica", "bold"); 
     doc.text("REGISTROS DE ATIVIDADES", 10, y); 
     y += 8;
-
-    // ESTA É A CORREÇÃO: Inverte a ordem apenas para o PDF
     const rondasCrescentes = [...db.rondas].reverse();
-
+    
     rondasCrescentes.forEach((r, index) => {
         if(y > 260) { doc.addPage(); y = 20; }
         doc.setFont("helvetica", "bold"); 
         doc.setFontSize(9);
         
-        // Agora o index 0 (primeira do dia) vira número 1
         doc.text(`${index + 1}. POSTO: ${r.posto.toUpperCase()}`, 10, y);
         y += 5; 
         
@@ -804,26 +719,27 @@ function gerarRelatorioPlantao() {
         doc.line(15, y - 2, 195, y - 2); 
         y += 5;
     });
-
     doc.save(`Relatorio_Plantao_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`);
 }
+
 // ==========================================
 //    FUNÇÕES EXCLUSIVAS DO PAINEL ADMIN
 // ==========================================
 
 async function carregarUsuariosParaAdmin() {
     try {
-        const snap = await fs.collection("usuarios").get();
-        listaUsuariosAdmin = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        
-        const sel = document.getElementById('adm-usuario');
-        if(!sel) return;
-        sel.innerHTML = '<option value="">Selecione o Operador...</option>';
-        
-        listaUsuariosAdmin.sort((a,b) => (a.nome || "").localeCompare(b.nome || ""));
-        listaUsuariosAdmin.forEach(u => {
-            sel.innerHTML += `<option value="${u.id}">${u.nome || u.email} (${u.cargo || 'Operador'})</option>`;
-        });
+        const { data: snap } = await sb.from('usuarios').select('*');
+        if(snap) {
+            listaUsuariosAdmin = snap;
+            const sel = document.getElementById('adm-usuario');
+            if(!sel) return;
+            sel.innerHTML = '<option value="">Selecione o Operador...</option>';
+            
+            listaUsuariosAdmin.sort((a,b) => (a.nome || "").localeCompare(b.nome || ""));
+            listaUsuariosAdmin.forEach(u => {
+                sel.innerHTML += `<option value="${u.id}">${u.nome || u.email} (${u.cargo || 'Operador'})</option>`;
+            });
+        }
     } catch (e) {
         console.error("Erro ao carregar usuários para o painel:", e);
     }
@@ -855,27 +771,29 @@ async function salvarRondaComoAdmin() {
     if(!posto) return alert("Selecione o posto!");
     if(!dataInput || !horaInput) return alert("Preencha data e hora do evento!");
 
-    const dataFormatada = dataInput;
     const checklistPadrao = {
         "APRESENTAÇÃO": "OK", "UNIFORME": "OK", "POSTURA": "OK",
         "LIVRO OCO.": "OK", "MATERIAL": "OK", "OUTROS": "OK"
     };
+    
     const novaRondaAdmin = {
         id: Date.now(),
         uid: uidOperador, 
         posto: posto,
         motivo: document.getElementById('adm-motivo').value,
         km: document.getElementById('adm-km').value || '0',
-        data: dataFormatada,
+        data: dataInput,
         hora: horaInput,
         colaborador: document.getElementById('adm-func').value || "N/A",
         obs: document.getElementById('adm-obs').value + " (Lançado via Painel Admin)",
         checklist: checklistPadrao,
-        foto: "", 
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        foto: ""
     };
+    
     try {
-        await fs.collection("rondas").add(novaRondaAdmin);
+        const { error } = await sb.from('rondas').insert([novaRondaAdmin]);
+        if(error) throw error;
+        
         document.getElementById('adm-km').value = "";
         document.getElementById('adm-func').value = "";
         document.getElementById('adm-obs').value = "";
@@ -885,6 +803,5 @@ async function salvarRondaComoAdmin() {
     }
 }
 </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>

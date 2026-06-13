@@ -46,20 +46,54 @@
 <body>
 
 <div id="view-login" class="container">
-    <div style="text-align: center; padding: 50px 0;">
+    <div style="text-align: center; padding: 40px 0 20px 0;">
         <h1 style="color: var(--accent); letter-spacing: 3px; margin:0;">SENTINELA OPS</h1>
         <p style="color: #94a3b8; font-size: 0.8rem;">SISTEMA OPERACIONAL EM NUVEM</p>
     </div>
-    <div class="card">
+
+    <div class="card" id="form-login">
         <h3>ACESSO DE SUPERVISÃO</h3>
         <label>Email Corporativo</label>
         <input type="email" id="login-email" placeholder="seu@email.com">
         <label>Senha</label>
         <input type="password" id="login-senha" placeholder="******">
-        <button class="btn btn-primary" onclick="login()">ENTRAR</button>
+        <button class="btn btn-primary" onclick="login()">ENTRAR NO SISTEMA</button>
         
+        <div style="margin-top: 15px; text-align: center; font-size: 0.8rem;">
+            <a href="#" onclick="alternarTelaAuth('form-recuperar')" style="color: var(--text-light); text-decoration: none; margin-right: 15px;">Esqueci a senha</a>
+            <a href="#" onclick="alternarTelaAuth('form-registo')" style="color: var(--accent); text-decoration: none; font-weight: bold;">Primeiro Acesso (Registar)</a>
+        </div>
         <div id="msg-login" style="color: var(--danger); text-align: center; margin-top: 15px; font-weight: bold;"></div>
     </div> 
+
+    <div class="card hidden" id="form-registo">
+        <h3>REGISTAR NOVO OPERADOR</h3>
+        <label>Nome Completo (Para o Perfil)</label>
+        <input type="text" id="reg-nome" placeholder="Ex: João da Silva">
+        <label>Email Corporativo</label>
+        <input type="email" id="reg-email" placeholder="seu@email.com">
+        <label>Criar Senha (Mín. 6 caracteres)</label>
+        <input type="password" id="reg-senha" placeholder="******">
+        <button class="btn btn-success" onclick="registarUsuario()" style="background: var(--success); color: white;">CRIAR CONTA</button>
+        
+        <div style="margin-top: 15px; text-align: center; font-size: 0.8rem;">
+            <a href="#" onclick="alternarTelaAuth('form-login')" style="color: var(--text-light); text-decoration: none;">Já tenho conta. Voltar ao Login.</a>
+        </div>
+        <div id="msg-registo" style="text-align: center; margin-top: 15px; font-weight: bold;"></div>
+    </div>
+
+    <div class="card hidden" id="form-recuperar">
+        <h3 style="color: #2563eb;">RECUPERAR SENHA</h3>
+        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: -10px;">Enviaremos um link de redefinição para o seu e-mail.</p>
+        <label>Email Corporativo</label>
+        <input type="email" id="rec-email" placeholder="seu@email.com">
+        <button class="btn btn-info" onclick="recuperarSenha()">ENVIAR LINK</button>
+        
+        <div style="margin-top: 15px; text-align: center; font-size: 0.8rem;">
+            <a href="#" onclick="alternarTelaAuth('form-login')" style="color: var(--text-light); text-decoration: none;">Voltar ao Login.</a>
+        </div>
+        <div id="msg-recuperar" style="text-align: center; margin-top: 15px; font-weight: bold;"></div>
+    </div>
 </div>
 
 <div id="app-content" class="hidden">
@@ -309,10 +343,70 @@ async function login() {
     
     if(!e || !s) return msg.innerText = "Preencha os campos!";
     msg.innerText = "Validando credenciais e privilégios...";
-    
     const { error } = await sb.auth.signInWithPassword({ email: e, password: s });
     if(error) msg.innerText = "Erro: E-mail ou senha incorretos.";
 }
+
+// --- INÍCIO DAS NOVAS FUNÇÕES DE AUTENTICAÇÃO ---
+
+// Alternar visualmente entre as telas
+function alternarTelaAuth(telaId) {
+    document.getElementById('form-login').classList.add('hidden');
+    document.getElementById('form-registo').classList.add('hidden');
+    document.getElementById('form-recuperar').classList.add('hidden');
+    
+    document.getElementById('msg-login').innerText = "";
+    document.getElementById('msg-registo').innerText = "";
+    document.getElementById('msg-recuperar').innerText = "";
+    
+    document.getElementById(telaId).classList.remove('hidden');
+}
+
+// Registo com gravação de Nome no Perfil
+async function registarUsuario() {
+    const nome = document.getElementById('reg-nome').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const senha = document.getElementById('reg-senha').value;
+    const msg = document.getElementById('msg-registo');
+    
+    if(!nome || !email || !senha) return msg.innerHTML = "<span style='color: var(--danger);'>Preencha todos os campos!</span>";
+    if(senha.length < 6) return msg.innerHTML = "<span style='color: var(--danger);'>A senha deve ter pelo menos 6 caracteres.</span>";
+
+    msg.innerHTML = "<span style='color: var(--accent);'>A criar conta corporativa...</span>";
+
+    const { data, error } = await sb.auth.signUp({
+        email: email,
+        password: senha,
+        options: { data: { full_name: nome, role: 'Operador' } }
+    });
+
+    if (error) {
+        msg.innerHTML = `<span style='color: var(--danger);'>Erro: ${error.message}</span>`;
+    } else {
+        msg.innerHTML = "<span style='color: var(--success);'>Conta criada! Aguarde a libertação de acesso pela Gerência.</span>";
+        setTimeout(() => alternarTelaAuth('form-login'), 4000);
+    }
+}
+
+// Solicitar link de nova senha
+async function recuperarSenha() {
+    const email = document.getElementById('rec-email').value.trim();
+    const msg = document.getElementById('msg-recuperar');
+    
+    if(!email) return msg.innerHTML = "<span style='color: var(--danger);'>Digite o seu email corporativo.</span>";
+    msg.innerHTML = "<span style='color: var(--accent);'>A enviar link...</span>";
+
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.href
+    });
+
+    if (error) {
+        msg.innerHTML = `<span style='color: var(--danger);'>Erro: ${error.message}</span>`;
+    } else {
+        msg.innerHTML = "<span style='color: var(--success);'>Link enviado para o seu e-mail!</span>";
+    }
+}
+// --- FIM DAS NOVAS FUNÇÕES ---
 
 async function logout() { 
     await sb.auth.signOut(); 

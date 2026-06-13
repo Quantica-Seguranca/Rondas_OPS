@@ -10,7 +10,8 @@
 
     <style>
         :root {
-            --primary: #0a192f; --accent: #ffd600; --danger: #f85149;
+            --primary: #0a192f;
+            --accent: #ffd600; --danger: #f85149;
             --success: #238636; --bg: #0f1c2e; --card: #16233a;
             --text: #e0e7ff; --text-light: #a3bffa;
         }
@@ -46,53 +47,46 @@
 <body>
 
 <div id="view-login" class="container">
-    <div style="text-align: center; padding: 40px 0 20px 0;">
+    <div style="text-align: center; padding: 50px 0;">
         <h1 style="color: var(--accent); letter-spacing: 3px; margin:0;">SENTINELA OPS</h1>
         <p style="color: #94a3b8; font-size: 0.8rem;">SISTEMA OPERACIONAL EM NUVEM</p>
     </div>
-
+    
     <div class="card" id="form-login">
-        <h3>ACESSO DE SUPERVISÃO</h3>
-        <label>Email Corporativo</label>
+        <h3>ACESSO RESTRITO</h3>
+        <label>Email Operacional</label>
         <input type="email" id="login-email" placeholder="seu@email.com">
         <label>Senha</label>
         <input type="password" id="login-senha" placeholder="******">
-        <button class="btn btn-primary" onclick="login()">ENTRAR NO SISTEMA</button>
-        
-        <div style="margin-top: 15px; text-align: center; font-size: 0.8rem;">
-            <a href="#" onclick="alternarTelaAuth('form-recuperar')" style="color: var(--text-light); text-decoration: none; margin-right: 15px;">Esqueci a senha</a>
-            <a href="#" onclick="alternarTelaAuth('form-registo')" style="color: var(--accent); text-decoration: none; font-weight: bold;">Primeiro Acesso (Registar)</a>
+        <button class="btn btn-primary" onclick="login()">ENTRAR</button>
+        <button class="btn btn-info" onclick="alternarTelaAuth('form-registo')" style="background: transparent; border: 1px solid #475569;">CRIAR CONTA</button>
+        <div style="text-align: center; margin-top: 18px;">
+            <a href="#" onclick="alternarTelaAuth('form-recuperar'); return false;" style="color: #94a3b8; font-size: 0.85rem; text-decoration: none; border-bottom: 1px solid #475569; padding-bottom: 2px;">Esqueci minha senha</a>
         </div>
-        <div id="msg-login" style="color: var(--danger); text-align: center; margin-top: 15px; font-weight: bold;"></div>
-    </div> 
+        <div id="msg-login" style="color: var(--danger); text-align: center; margin-top: 10px; font-weight: bold;"></div>
+    </div>
 
     <div class="card hidden" id="form-registo">
-        <h3>REGISTAR NOVO OPERADOR</h3>
-        <label>Nome Completo (Para o Perfil)</label>
-        <input type="text" id="reg-nome" placeholder="Ex: João da Silva">
-        <label>Email Corporativo</label>
+        <h3>CRIAR NOVA CONTA CORPORATIVA</h3>
+        <label>Nome Completo</label>
+        <input type="text" id="reg-nome" placeholder="Ex: Ricardo Kerber">
+        <label>Email Operacional</label>
         <input type="email" id="reg-email" placeholder="seu@email.com">
-        <label>Criar Senha (Mín. 6 caracteres)</label>
+        <label>Senha (Mínimo 6 caracteres)</label>
         <input type="password" id="reg-senha" placeholder="******">
-        <button class="btn btn-success" onclick="registarUsuario()" style="background: var(--success); color: white;">CRIAR CONTA</button>
-        
-        <div style="margin-top: 15px; text-align: center; font-size: 0.8rem;">
-            <a href="#" onclick="alternarTelaAuth('form-login')" style="color: var(--text-light); text-decoration: none;">Já tenho conta. Voltar ao Login.</a>
-        </div>
-        <div id="msg-registo" style="text-align: center; margin-top: 15px; font-weight: bold;"></div>
+        <button class="btn btn-primary" onclick="cadastrar()">CONCLUIR CADASTRO</button>
+        <button class="btn btn-danger" onclick="alternarTelaAuth('form-login')" style="background: transparent; border: 1px solid #475569; margin-top:8px;">VOLTAR AO LOGIN</button>
+        <div id="msg-registo" style="color: var(--accent); text-align: center; margin-top: 10px; font-weight: bold;"></div>
     </div>
 
     <div class="card hidden" id="form-recuperar">
-        <h3 style="color: #2563eb;">RECUPERAR SENHA</h3>
-        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: -10px;">Enviaremos um link de redefinição para o seu e-mail.</p>
-        <label>Email Corporativo</label>
+        <h3>RECUPERAR ACESSO</h3>
+        <p style="font-size:0.8rem; color:#94a3b8; margin-top:-10px;">Insira o seu e-mail cadastrado para receber o link de redefinição.</p>
+        <label>Email Cadastrado</label>
         <input type="email" id="rec-email" placeholder="seu@email.com">
-        <button class="btn btn-info" onclick="recuperarSenha()">ENVIAR LINK</button>
-        
-        <div style="margin-top: 15px; text-align: center; font-size: 0.8rem;">
-            <a href="#" onclick="alternarTelaAuth('form-login')" style="color: var(--text-light); text-decoration: none;">Voltar ao Login.</a>
-        </div>
-        <div id="msg-recuperar" style="text-align: center; margin-top: 15px; font-weight: bold;"></div>
+        <button class="btn btn-primary" onclick="recuperarSenha()">ENVIAR LINK DE REDEFINIÇÃO</button>
+        <button class="btn btn-danger" onclick="alternarTelaAuth('form-login')" style="background: transparent; border: 1px solid #475569; margin-top:8px;">VOLTAR AO LOGIN</button>
+        <div id="msg-recuperar" style="color: var(--accent); text-align: center; margin-top: 10px; font-weight: bold;"></div>
     </div>
 </div>
 
@@ -186,7 +180,7 @@
     <div id="view-admin" class="container hidden">
         <div class="card">
             <h3>LANÇAMENTO RETROATIVO / GESTÃO</h3>
-            <p style="font-size: 0.8rem; color: #94a3b8; margin-top: -10px;">Lance rondas em nome de qualquer operador.</p>
+            <p style="font-size: 0.8rem; color: #94a3b8; margin-top: -10px;">Lance rondas em nome de qualquer operador. O sistema processará como uma atividade real.</p>
             
             <label>1. SELECIONE O OPERADOR *</label>
             <select id="adm-usuario" onchange="atualizarVtrAdmin()"></select>
@@ -249,6 +243,13 @@ let listaUsuariosAdmin = [];
 
 function saveLocal() { localStorage.setItem('sentinela_ops_db', JSON.stringify(db)); }
 
+function alternarTelaAuth(formId) {
+    document.getElementById('form-login').classList.add('hidden');
+    document.getElementById('form-registo').classList.add('hidden');
+    document.getElementById('form-recuperar').classList.add('hidden');
+    document.getElementById(formId).classList.remove('hidden');
+}
+
 sb.auth.onAuthStateChange(async (event, session) => {
     if (session) {
         currentUserUid = session.user.id;
@@ -263,7 +264,7 @@ sb.auth.onAuthStateChange(async (event, session) => {
 });
 
 // ==========================================
-//    NOVA INTEGRAÇÃO COM ADMIN MASTER (ABAC)
+//    INTEGRAÇÃO COM ADMIN MASTER (ABAC)
 // ==========================================
 async function validarGovernanca(uid, email) {
     try {
@@ -278,24 +279,21 @@ async function validarGovernanca(uid, email) {
 
         const perms = perfilMaster.permissions || {};
         
-        // Bloqueio de Acesso Geral ao Módulo
         if (perms.ronda_acesso !== true && perfilMaster.role !== 'Admin') {
             msgLog.innerText = "ACESSO BLOQUEADO: Você não tem permissão para acessar a ferramenta de Rondas.";
             await sb.auth.signOut();
             return;
         }
 
-        // Preenche o perfil local com os dados da nuvem
         db.perfil.nome = perfilMaster.full_name || email;
         db.perfil.role = perfilMaster.role;
         db.perfil.cargo = perfilMaster.role;
         db.perfil.permissions = perms;
 
-        // Gestão de Menus (ABAC)
+        // Gestão de Abas (ABAC)
         const navAdmin = document.getElementById('nav-admin');
         const btnNovoPosto = document.getElementById('btn-novo-posto');
 
-        // Permissão de Lançamento Retroativo
         if (perms.ronda_retroativa === true || perfilMaster.role === 'Admin') {
             navAdmin.classList.remove('hidden');
             carregarUsuariosParaAdmin();
@@ -303,11 +301,10 @@ async function validarGovernanca(uid, email) {
             navAdmin.classList.add('hidden');
         }
 
-        // Permissão de Gerenciar Postos
         if (perms.ronda_admin === true || perfilMaster.role === 'Admin') {
-            btnNovoPosto.style.display = 'block';
+            if(btnNovoPosto) btnNovoPosto.style.display = 'block';
         } else {
-            btnNovoPosto.style.display = 'none';
+            if(btnNovoPosto) btnNovoPosto.style.display = 'none';
         }
 
         sincronizarDadosBase(uid);
@@ -317,11 +314,11 @@ async function validarGovernanca(uid, email) {
 }
 
 async function sincronizarDadosBase(uid) {
-    // Busca postos
+    // Busca universal de postos (Aparece para todos)
     const { data: postosSnap } = await sb.from('postos').select('*');
     if (postosSnap) db.postos = postosSnap;
 
-    // Busca rondas recentes do usuário para manter o histórico offline
+    // Busca de rondas do usuário
     const { data: rondasSnap } = await sb.from('rondas').select('*').eq('uid', uid).order('id', { ascending: false }).limit(50);
     const rondasRemotas = rondasSnap || [];
     const dataZeramento = db.perfil.ultimoZeramento || 0;
@@ -342,71 +339,49 @@ async function login() {
     const msg = document.getElementById('msg-login');
     
     if(!e || !s) return msg.innerText = "Preencha os campos!";
-    msg.innerText = "Validando credenciais e privilégios...";
+    msg.innerText = "Validando credenciais...";
+    
     const { error } = await sb.auth.signInWithPassword({ email: e, password: s });
     if(error) msg.innerText = "Erro: E-mail ou senha incorretos.";
 }
 
-// --- INÍCIO DAS NOVAS FUNÇÕES DE AUTENTICAÇÃO ---
-
-// Alternar visualmente entre as telas
-function alternarTelaAuth(telaId) {
-    document.getElementById('form-login').classList.add('hidden');
-    document.getElementById('form-registo').classList.add('hidden');
-    document.getElementById('form-recuperar').classList.add('hidden');
-    
-    document.getElementById('msg-login').innerText = "";
-    document.getElementById('msg-registo').innerText = "";
-    document.getElementById('msg-recuperar').innerText = "";
-    
-    document.getElementById(telaId).classList.remove('hidden');
-}
-
-// Registo com gravação de Nome no Perfil
-async function registarUsuario() {
-    const nome = document.getElementById('reg-nome').value.trim();
-    const email = document.getElementById('reg-email').value.trim();
-    const senha = document.getElementById('reg-senha').value;
+async function cadastrar() {
+    const n = document.getElementById('reg-nome').value.trim();
+    const e = document.getElementById('reg-email').value.trim();
+    const s = document.getElementById('reg-senha').value;
     const msg = document.getElementById('msg-registo');
-    
-    if(!nome || !email || !senha) return msg.innerHTML = "<span style='color: var(--danger);'>Preencha todos os campos!</span>";
-    if(senha.length < 6) return msg.innerHTML = "<span style='color: var(--danger);'>A senha deve ter pelo menos 6 caracteres.</span>";
 
-    msg.innerHTML = "<span style='color: var(--accent);'>A criar conta corporativa...</span>";
+    if(!n || !e || !s) return msg.innerText = "Preencha todos os campos!";
+    msg.innerText = "Criando conta corporativa...";
 
-    const { data, error } = await sb.auth.signUp({
-        email: email,
-        password: senha,
-        options: { data: { full_name: nome, role: 'Operador' } }
+    const { error } = await sb.auth.signUp({
+        email: e,
+        password: s,
+        options: { data: { full_name: n, role: 'Operador' } }
     });
 
     if (error) {
-        msg.innerHTML = `<span style='color: var(--danger);'>Erro: ${error.message}</span>`;
+        msg.innerText = "Erro: " + error.message;
     } else {
-        msg.innerHTML = "<span style='color: var(--success);'>Conta criada! Aguarde a libertação de acesso pela Gerência.</span>";
-        setTimeout(() => alternarTelaAuth('form-login'), 4000);
+        msg.style.color = "var(--success)";
+        msg.innerText = "✅ Conta criada com sucesso! Aguarde a liberação de acesso da gerência.";
+        setTimeout(() => alternarTelaAuth('form-login'), 3500);
     }
 }
 
-// Solicitar link de nova senha
 async function recuperarSenha() {
-    const email = document.getElementById('rec-email').value.trim();
+    const e = document.getElementById('rec-email').value.trim();
     const msg = document.getElementById('msg-recuperar');
-    
-    if(!email) return msg.innerHTML = "<span style='color: var(--danger);'>Digite o seu email corporativo.</span>";
-    msg.innerHTML = "<span style='color: var(--accent);'>A enviar link...</span>";
+    if(!e) return alert("Insira o seu e-mail corporativo no campo!");
 
-    const { error } = await sb.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.href
-    });
-
-    if (error) {
-        msg.innerHTML = `<span style='color: var(--danger);'>Erro: ${error.message}</span>`;
+    const { error } = await sb.auth.resetPasswordForEmail(e, { redirectTo: window.location.href });
+    if(error) {
+        alert("Erro: " + error.message);
     } else {
-        msg.innerHTML = "<span style='color: var(--success);'>Link enviado para o seu e-mail!</span>";
+        alert("✅ Link de recuperação enviado com sucesso! Verifique a sua caixa de entrada.");
+        alternarTelaAuth('form-login');
     }
 }
-// --- FIM DAS NOVAS FUNÇÕES ---
 
 async function logout() { 
     await sb.auth.signOut(); 
@@ -486,23 +461,43 @@ async function adicionarPosto() {
     const endereco = prompt("Endereço:");
     const novoPosto = { nome: nome.toUpperCase(), endereco: endereco || "Sem endereço", uid: currentUserUid };
     const { data, error } = await sb.from('postos').insert([novoPosto]).select();
-    if(!error && data) { db.postos.push(data[0]); saveLocal(); renderPostos(); }
+    if(!error && data) { db.postos.push(data[0]); saveLocal(); renderPostos(); alert("✅ Posto adicionado universalmente!"); }
 }
 
 function renderPostos() {
     const busca = document.getElementById('busca-posto').value.toUpperCase();
     const container = document.getElementById('lista-postos');
     const filtrados = db.postos.filter(p => p.nome.includes(busca));
-    const isGestor = db.perfil.role === 'Admin' || (db.perfil.permissions && db.perfil.permissions.ronda_admin);
+    const isGestor = db.perfil.role === 'Admin' || (db.perfil.permissions && db.perfil.permissions.ronda_admin === true);
     
     container.innerHTML = filtrados.map((p, i) => `
     <div class="posto-item">
-        <div style="flex:1;"><b>${p.nome}</b><br><small>${p.endereco}</small></div>
+        <div style="flex:1;"><b>${p.nome}</b><br><small style="color:#94a3b8;">${p.endereco}</small></div>
         <div style="display:flex;">
-            <button onclick="window.open('https://www.google.com/maps/search/?api=1&query=$${encodeURIComponent(p.endereco)}', '_blank')" class="btn-small" style="background:#238636;">ROTA</button>
-            ${isGestor ? `<button onclick="excluirPosto('${p.id}', ${db.postos.indexOf(p)})" class="btn-small" style="background:#f85149;">🗑️</button>` : ""}      
+            <button onclick="window.open('http://googleusercontent.com/maps.google.com/3{encodeURIComponent(p.endereco)}', '_blank')" class="btn-small" style="background:#238636;">ROTA</button>
+            ${isGestor ? `
+                <button onclick="editarPosto('${p.id}', ${db.postos.indexOf(p)})" class="btn-small" style="background:#2563eb;">✏️</button>
+                <button onclick="excluirPosto('${p.id}', ${db.postos.indexOf(p)})" class="btn-small" style="background:#f85149;">🗑️</button>
+            ` : ""}      
         </div>
     </div>`).join('');
+}
+
+async function editarPosto(id, index) {
+    const posto = db.postos[index];
+    const novoNome = prompt("Editar nome do Posto:", posto.nome);
+    if (!novoNome) return;
+    const novoEndereco = prompt("Editar endereço:", posto.endereco);
+    const dadosAtualizados = { nome: novoNome.toUpperCase(), endereco: novoEndereco || "Sem endereço" };
+
+    try {
+        if (id) {
+            const { error } = await sb.from('postos').update(dadosAtualizados).eq('id', id);
+            if (error) throw error;
+        }
+        db.postos[index] = { ...posto, ...dadosAtualizados };
+        saveLocal(); renderPostos(); alert("✅ Posto atualizado!");
+    } catch(err) { alert("Erro ao editar: " + err.message); }
 }
 
 async function excluirPosto(id, index) {
@@ -592,86 +587,52 @@ async function carregarUsuariosParaAdmin() {
     try {
         const { data: snap, error } = await sb.from('profiles').select('id, full_name, role');
         if (error) throw error;
-        
-        if (snap) {
+        if(snap) {
             listaUsuariosAdmin = snap;
             const sel = document.getElementById('adm-usuario');
             sel.innerHTML = '<option value="">Selecione o Operador...</option>';
-            
-            // Ordenar a lista por ordem alfabética para facilitar
             listaUsuariosAdmin.sort((a,b) => (a.full_name || "").localeCompare(b.full_name || ""));
-            
-            listaUsuariosAdmin.forEach(u => { 
-                sel.innerHTML += `<option value="${u.id}">${u.full_name || 'Desconhecido'} (${u.role || 'Operador'})</option>`; 
-            });
+            listaUsuariosAdmin.forEach(u => { sel.innerHTML += `<option value="${u.id}">${u.full_name || u.email} (${u.role || 'Operador'})</option>`; });
         }
-    } catch (e) {
-        console.error("Erro ao carregar utilizadores para o painel admin:", e);
-    }
+    } catch(e) { console.error("Erro ao carregar usuários:", e); }
 }
 
 function atualizarVtrAdmin() {
     const uidSelecionado = document.getElementById('adm-usuario').value;
-    const usuario = listaUsuariosAdmin.find(u => u.id === uidSelecionado);
     const inputPlaca = document.getElementById('adm-placa');
-    
     if(inputPlaca) {
-        // Remove a opacidade e o bloqueio readonly para permitir que o admin digite a VTR
-        inputPlaca.value = "SEM VTR"; 
+        inputPlaca.value = "DIGITE A PLACA"; 
         inputPlaca.removeAttribute('readonly'); 
         inputPlaca.style.opacity = '1';
     }
 }
 
 function atualizarSelectPostosAdmin() {
-    const sel = document.getElementById('adm-posto');
-    if(!sel) return;
-    sel.innerHTML = '<option value="">Selecione o posto...</option>';
+    const sel = document.getElementById('adm-posto'); sel.innerHTML = '<option value="">Selecione o posto...</option>';
     db.postos.forEach(p => sel.innerHTML += `<option value="${p.nome}">${p.nome}</option>`);
 }
 
 async function salvarRondaComoAdmin() {
     const uidOperador = document.getElementById('adm-usuario').value;
     const posto = document.getElementById('adm-posto').value;
-    const dataInput = document.getElementById('adm-data').value;
-    const horaInput = document.getElementById('adm-hora').value;
-
-    if(!uidOperador) return alert("Selecione o operador que receberá a ronda!");
-    if(!posto) return alert("Selecione o posto!");
-    if(!dataInput || !horaInput) return alert("Preencha data e hora do evento!");
-
-    const checklistPadrao = {
-        "APRESENTAÇÃO": "OK", "UNIFORME": "OK", "POSTURA": "OK",
-        "LIVRO OCO.": "OK", "MATERIAL": "OK", "OUTROS": "OK"
-    };
+    const dataInput = document.getElementById('adm-data').value; const horaInput = document.getElementById('adm-hora').value;
+    if(!uidOperador || !posto || !dataInput || !horaInput) return alert("Preencha todos os campos obrigatórios!");
     
+    const checklistPadrao = { "APRESENTAÇÃO": "OK", "UNIFORME": "OK", "POSTURA": "OK", "LIVRO OCO.": "OK", "MATERIAL": "OK", "OUTROS": "OK" };
     const novaRondaAdmin = {
-        id: Date.now(), 
-        uid: uidOperador, 
-        posto: posto, 
-        motivo: document.getElementById('adm-motivo').value,
-        km: document.getElementById('adm-km').value || '0', 
-        data: dataInput, 
-        hora: horaInput,
-        colaborador: document.getElementById('adm-func').value || "N/A", 
-        obs: document.getElementById('adm-obs').value + " (Lançado via Painel Admin)",
-        checklist: checklistPadrao, 
-        foto: ""
+        id: Date.now(), uid: uidOperador, posto: posto, motivo: document.getElementById('adm-motivo').value,
+        km: document.getElementById('adm-km').value || '0', data: dataInput, hora: horaInput,
+        colaborador: document.getElementById('adm-func').value || "N/A", obs: document.getElementById('adm-obs').value + " (Lançado via Painel Admin)",
+        checklist: checklistPadrao, foto: ""
     };
-
     try { 
         const { error } = await sb.from('rondas').insert([novaRondaAdmin]); 
         if(error) throw error;
-
-        // Limpa os campos do formulário após o sucesso do lançamento
         document.getElementById('adm-km').value = "";
         document.getElementById('adm-func').value = "";
         document.getElementById('adm-obs').value = "";
-        
-        alert("✅ Ronda inserida com sucesso no perfil do operador!"); 
-    } catch(e) { 
-        alert("Erro técnico ao injetar ronda no banco remoto: " + e.message); 
-    }
+        alert("✅ Lançamento retroativo efetuado com sucesso!"); 
+    } catch(e) { alert("Erro técnico: " + e.message); }
 }
 </script>
 </body>

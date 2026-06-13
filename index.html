@@ -518,9 +518,27 @@ async function zerarRondasPlantao() {
 }
 
 async function salvarPerfil() {
-    db.perfil.matricula = document.getElementById('p-matricula').value;
-    db.perfil.placa = document.getElementById('p-placa').value.toUpperCase();
-    saveLocal(); alert("✅ Perfil salvo no dispositivo!");
+    const matricula = document.getElementById('p-matricula').value.trim();
+    const placa = document.getElementById('p-placa').value.toUpperCase().trim();
+
+    try {
+        // Envia a matrícula e a placa diretamente para a tabela profiles do Supabase
+        const { error } = await sb.from('profiles').update({
+            matricula: matricula,
+            placa: placa
+        }).eq('id', currentUserUid);
+
+        if (error) throw error;
+
+        // Guarda localmente para o funcionamento em tempo real
+        db.perfil.matricula = matricula;
+        db.perfil.placa = placa;
+        saveLocal();
+        
+        alert("✅ Perfil gravado no Cloud com sucesso!");
+    } catch (err) {
+        alert("Erro técnico ao salvar no Cloud: " + err.message);
+    }
 }
 
 function preencherCamposPerfil() {

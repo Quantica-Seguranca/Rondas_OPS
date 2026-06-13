@@ -289,6 +289,10 @@ async function validarGovernanca(uid, email) {
         db.perfil.role = perfilMaster.role;
         db.perfil.cargo = perfilMaster.role;
         db.perfil.permissions = perms;
+        db.perfil.matricula = perfilMaster.matricula || ""; // Puxa a matrícula do Cloud
+        db.perfil.placa = perfilMaster.placa || "";         // Puxa a placa da viatura do Cloud
+
+        // Gestão de Abas (ABAC)
 
         // Gestão de Abas (ABAC)
         const navAdmin = document.getElementById('nav-admin');

@@ -585,34 +585,93 @@ function gerarRelatorioPlantao() {
     doc.save(`Relatorio_Plantao.pdf`);
 }
 
+// ==========================================
+//    FUNÇÕES EXCLUSIVAS DO PAINEL ADMIN
+// ==========================================
 async function carregarUsuariosParaAdmin() {
-    const { data: snap } = await sb.from('profiles').select('*');
-    if(snap) {
-        listaUsuariosAdmin = snap;
-        const sel = document.getElementById('adm-usuario');
-        sel.innerHTML = '<option value="">Selecione o Supervisor/Fiscal...</option>';
-        listaUsuariosAdmin.forEach(u => { sel.innerHTML += `<option value="${u.id}">${u.full_name || 'Desconhecido'} (${u.role})</option>`; });
+    try {
+        const { data: snap, error } = await sb.from('profiles').select('id, full_name, role');
+        if (error) throw error;
+        
+        if (snap) {
+            listaUsuariosAdmin = snap;
+            const sel = document.getElementById('adm-usuario');
+            sel.innerHTML = '<option value="">Selecione o Operador...</option>';
+            
+            // Ordenar a lista por ordem alfabética para facilitar
+            listaUsuariosAdmin.sort((a,b) => (a.full_name || "").localeCompare(b.full_name || ""));
+            
+            listaUsuariosAdmin.forEach(u => { 
+                sel.innerHTML += `<option value="${u.id}">${u.full_name || 'Desconhecido'} (${u.role || 'Operador'})</option>`; 
+            });
+        }
+    } catch (e) {
+        console.error("Erro ao carregar utilizadores para o painel admin:", e);
     }
 }
-function atualizarVtrAdmin() {} // Mantido vazio simplificado
+
+function atualizarVtrAdmin() {
+    const uidSelecionado = document.getElementById('adm-usuario').value;
+    const usuario = listaUsuariosAdmin.find(u => u.id === uidSelecionado);
+    const inputPlaca = document.getElementById('adm-placa');
+    
+    if(inputPlaca) {
+        // Remove a opacidade e o bloqueio readonly para permitir que o admin digite a VTR
+        inputPlaca.value = "SEM VTR"; 
+        inputPlaca.removeAttribute('readonly'); 
+        inputPlaca.style.opacity = '1';
+    }
+}
+
 function atualizarSelectPostosAdmin() {
-    const sel = document.getElementById('adm-posto'); sel.innerHTML = '<option value="">Selecione o posto...</option>';
+    const sel = document.getElementById('adm-posto');
+    if(!sel) return;
+    sel.innerHTML = '<option value="">Selecione o posto...</option>';
     db.postos.forEach(p => sel.innerHTML += `<option value="${p.nome}">${p.nome}</option>`);
 }
+
 async function salvarRondaComoAdmin() {
     const uidOperador = document.getElementById('adm-usuario').value;
     const posto = document.getElementById('adm-posto').value;
-    const dataInput = document.getElementById('adm-data').value; const horaInput = document.getElementById('adm-hora').value;
-    if(!uidOperador || !posto || !dataInput || !horaInput) return alert("Preencha todos os campos obrigatórios!");
+    const dataInput = document.getElementById('adm-data').value;
+    const horaInput = document.getElementById('adm-hora').value;
+
+    if(!uidOperador) return alert("Selecione o operador que receberá a ronda!");
+    if(!posto) return alert("Selecione o posto!");
+    if(!dataInput || !horaInput) return alert("Preencha data e hora do evento!");
+
+    const checklistPadrao = {
+        "APRESENTAÇÃO": "OK", "UNIFORME": "OK", "POSTURA": "OK",
+        "LIVRO OCO.": "OK", "MATERIAL": "OK", "OUTROS": "OK"
+    };
     
     const novaRondaAdmin = {
-        id: Date.now(), uid: uidOperador, posto: posto, motivo: document.getElementById('adm-motivo').value,
-        km: document.getElementById('adm-km').value || '0', data: dataInput, hora: horaInput,
-        colaborador: document.getElementById('adm-func').value || "N/A", obs: document.getElementById('adm-obs').value + " (Lançado via Painel Admin)",
-        checklist: {"APRESENTAÇÃO": "OK", "UNIFORME": "OK", "POSTURA": "OK", "LIVRO OCO.": "OK", "MATERIAL": "OK", "OUTROS": "OK"}, foto: ""
+        id: Date.now(), 
+        uid: uidOperador, 
+        posto: posto, 
+        motivo: document.getElementById('adm-motivo').value,
+        km: document.getElementById('adm-km').value || '0', 
+        data: dataInput, 
+        hora: horaInput,
+        colaborador: document.getElementById('adm-func').value || "N/A", 
+        obs: document.getElementById('adm-obs').value + " (Lançado via Painel Admin)",
+        checklist: checklistPadrao, 
+        foto: ""
     };
-    try { await sb.from('rondas').insert([novaRondaAdmin]); alert("✅ Lançamento retroativo efetuado com sucesso!"); } 
-    catch(e) { alert("Erro técnico: " + e.message); }
+
+    try { 
+        const { error } = await sb.from('rondas').insert([novaRondaAdmin]); 
+        if(error) throw error;
+
+        // Limpa os campos do formulário após o sucesso do lançamento
+        document.getElementById('adm-km').value = "";
+        document.getElementById('adm-func').value = "";
+        document.getElementById('adm-obs').value = "";
+        
+        alert("✅ Ronda inserida com sucesso no perfil do operador!"); 
+    } catch(e) { 
+        alert("Erro técnico ao injetar ronda no banco remoto: " + e.message); 
+    }
 }
 </script>
 </body>
